@@ -4,5 +4,5 @@ This project is about finding out what quickfix list can be used for.
 
 #Commands
 
-1. `:KeymapsFindByCommand` Find keymap by command in main modes
-2. `:KeymapsFindByDescription` Find keymap by description in main modes
+1. `:KeymapsFindByCommand [mode] <command_pattern>` Find keymap by command in main modes
+2. `:KeymapsFindByDescription [mode] <command_pattern>` Find keymap by description in main modes
