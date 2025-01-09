@@ -1,14 +1,32 @@
 local Module = {}
 
-local function get_search_pattern(input)
-  local lowerInput = string.lower(input)
-  local spaceLowerInput = lowerInput:gsub("<space>", " ")
-  local fuzzySpaceLowerInput = ".*" .. string.gsub(spaceLowerInput, ".", function(character) return character .. ".*" end)
-  return fuzzySpaceLowerInput
+local function split_string(input)
+    local result = {}
+    for i = 1, #input do
+        table.insert(result, string.lower(string.sub(input, i, i)))
+    end
+    return result
+end
+
+local function escape_pattern(text)
+    return string.gsub(text, "([^%w])", "%%%1")
+end
+
+local function get_keymap_with_space_char(keymap)
+  return string.gsub(keymap, "<space>", " ")
 end
 
 local function get_keymap_with_space_label(keymap)
   return string.gsub(keymap, " ", "<space>")
+end
+
+local function get_search_pattern(input)
+  local search_pattern = ".*"
+  local characters = split_string(get_keymap_with_space_char(input))
+  for _, character in ipairs(characters) do
+    search_pattern = search_pattern .. escape_pattern(character) .. ".*"
+  end
+  return search_pattern
 end
 
 local function extractFilePathAndLineNumber(str)
@@ -23,7 +41,7 @@ local function extractFilePathAndLineNumber(str)
 end
 
 local function expand_tilde(path)
-    if path:sub(1, 1) == "~" then
+    if string.sub(path, 1, 1) == "~" then
         local home = os.getenv("HOME")
         if home then
             return home .. string.sub(path, 2)
@@ -44,7 +62,6 @@ local function filter_keymaps(keymaps, search_pattern, mode)
 
   for _, keymap in ipairs(keymaps) do
     if string.match(string.lower(keymap.lhs), search_pattern) then
-
       local mapOutput = vim.fn.execute("verbose " .. mode .. "map " .. get_keymap_with_space_label(keymap.lhs))
       local filePath, lineNumber = extractFilePathAndLineNumber(mapOutput)
 
