@@ -36,3 +36,8 @@ vim.api.nvim_create_user_command("KeymapsFindByDescription", function(opts)
 
   quickfix_expanse.find_keymaps_by_description(description, { mode })
 end, { nargs = "*" })
+
+vim.api.nvim_create_user_command("FindFiles", function(opts)
+  vim.cmd("vimgrep '\\%^' " .. opts.args)
+  vim.cmd("copen")
+end, { nargs = 1 })
